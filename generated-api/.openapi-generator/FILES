@@ -1,0 +1,7 @@
+.openapi-generator-ignore
+apis/FirstWebApplicationApi.ts
+apis/index.ts
+index.ts
+models/Concert.ts
+models/index.ts
+runtime.ts
