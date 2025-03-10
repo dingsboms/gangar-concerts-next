@@ -5,7 +5,7 @@ import { Concert } from "../generated-api";
 import { fetchConcerts } from "./utils/fetchConcerts";
 import { createConcert } from "./utils/createConcert";
 import { updateConcert } from "./utils/updateConcert";
-import { deleteConcert } from "./utils/deleteConcert"; // Import new utility
+import { deleteConcert } from "./utils/deleteConcert";
 import ConcertTile from "./components/ConcertTile";
 import AddConcertButton from "./components/AddConcertButton";
 import NewConcertModal from "./components/NewConcertModal";
@@ -119,7 +119,7 @@ export default function Home() {
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onSave={handleSaveEditedConcert}
-          onDelete={handleDeleteConcert} // Pass delete handler
+          onDelete={handleDeleteConcert}
           initialConcert={selectedConcert}
         />
       </main>
