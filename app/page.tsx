@@ -1,6 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Concert, Configuration, FirstWebApplicationApi } from "../generated-api";
+import {
+  Concert,
+  Configuration,
+  FirstWebApplicationApi,
+} from "../generated-api";
 
 export default function Home() {
   const [concerts, setConcerts] = useState<Concert[]>([]);
@@ -11,7 +15,8 @@ export default function Home() {
     const fetchConcerts = async () => {
       try {
         const config = new Configuration({
-          basePath: "https://gangarconcertswebapp-duchgsaff5enbfay.swedencentral-01.azurewebsites.net",
+          basePath:
+            "https://gangarconcertswebapp-duchgsaff5enbfay.swedencentral-01.azurewebsites.net",
         });
         const api = new FirstWebApplicationApi(config);
 
@@ -19,8 +24,14 @@ export default function Home() {
         setConcerts(concertList);
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
-        const details = err instanceof Response ? `Status: ${err.status} ${err.statusText}` : "";
-        setError(`Failed to fetch concerts: ${message}${details ? " - " + details : ""}`);
+        const details = err instanceof Response
+          ? `Status: ${err.status} ${err.statusText}`
+          : "";
+        setError(
+          `Failed to fetch concerts: ${message}${
+            details ? " - " + details : ""
+          }`,
+        );
         console.error("Fetch error:", err);
       } finally {
         setLoading(false);
@@ -31,7 +42,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] text-black bg-white">
+    <div className="items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 text-black bg-white">
       <main className="flex flex-col gap-8 items-center sm:items-start w-full max-w-4xl">
         <h1 className="text-3xl font-bold">Upcoming Concerts</h1>
 
@@ -52,21 +63,18 @@ export default function Home() {
                 <h2 className="text-xl font-semibold">{concert.title}</h2>
                 <p>Location: {concert.location}</p>
                 <p>
-                  Date:{" "}
-                  {concert.date
+                  Date: {concert.date
                     ? new Date(concert.date).toLocaleDateString()
                     : "TBA"}
                 </p>
                 <p>ID: {concert.id ?? "Not Assigned"}</p>
                 <p className="text-sm text-gray-500">
-                  Created:{" "}
-                  {concert.created
+                  Created: {concert.created
                     ? new Date(concert.created).toLocaleString()
                     : "Unknown"}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Last Modified:{" "}
-                  {concert.lastModified
+                  Last Modified: {concert.lastModified
                     ? new Date(concert.lastModified).toLocaleString()
                     : "Not Modified"}
                 </p>
