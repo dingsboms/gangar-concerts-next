@@ -4,12 +4,11 @@ import {
     FirstWebApplicationApi,
 } from "../../generated-api";
 
-const API_BASE_URL =
-    "https://gangarconcertswebapp-duchgsaff5enbfay.swedencentral-01.azurewebsites.net";
-
 export async function fetchConcerts(): Promise<Concert[]> {
     try {
-        const config = new Configuration({ basePath: API_BASE_URL });
+        const config = new Configuration({
+            basePath: process.env.NEXT_PUBLIC_BACKEND_URL,
+        });
         const api = new FirstWebApplicationApi(config);
         const concertList = await api.concertsGet();
         return concertList;

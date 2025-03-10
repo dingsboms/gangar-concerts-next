@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Concert } from "../generated-api";
 import { fetchConcerts } from "./functions/fetchConcerts";
 import ConcertTile from "./components/concertTile";
+import AddButton from "./components/addConcertButton";
+import AddConcertButton from "./components/addConcertButton";
 
 export default function Home() {
   const [concerts, setConcerts] = useState<Concert[]>([]);
@@ -37,6 +39,7 @@ export default function Home() {
             ))}
           </ul>
         )}
+        <AddConcertButton />
       </main>
     </div>
   );
