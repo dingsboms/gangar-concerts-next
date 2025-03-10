@@ -1,16 +1,19 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Concert } from "../generated-api";
-import { fetchConcerts } from "./functions/fetchConcerts";
+import { fetchConcerts } from "./utils/fetchConcerts";
+import { createConcert } from "./utils/createConcert";
 import ConcertTile from "./components/concertTile";
-import AddButton from "./components/addConcertButton";
 import AddConcertButton from "./components/addConcertButton";
+import NewConcertModal from "./components/newConcertModal";
 
 export default function Home() {
   const [concerts, setConcerts] = useState<Concert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Fetch concerts initially
   useEffect(() => {
     fetchConcerts()
       .then(setConcerts)
@@ -19,6 +22,25 @@ export default function Home() {
       )
       .finally(() => setLoading(false));
   }, []);
+
+  const openNewConcertModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleSaveConcert = async (newConcert: Partial<Concert>) => {
+    try {
+      // Call createConcert to save the new concert
+      await createConcert(newConcert);
+      // Refresh the concert list after successful creation
+      const updatedConcerts = await fetchConcerts();
+      setConcerts(updatedConcerts);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save concert");
+      console.error("Save concert error:", err);
+    } finally {
+      setIsModalOpen(false); // Close the modal regardless of outcome
+    }
+  };
 
   return (
     <div className="items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 text-black bg-white">
@@ -39,7 +61,12 @@ export default function Home() {
             ))}
           </ul>
         )}
-        <AddConcertButton />
+        <AddConcertButton onClick={openNewConcertModal} />
+        <NewConcertModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveConcert}
+        />
       </main>
     </div>
   );

@@ -1,15 +1,9 @@
-import {
-    Concert,
-    Configuration,
-    FirstWebApplicationApi,
-} from "../../generated-api";
+// utils/fetchConcerts.ts
+import { Concert } from "../../generated-api";
+import { api } from "./apiClient";
 
 export async function fetchConcerts(): Promise<Concert[]> {
     try {
-        const config = new Configuration({
-            basePath: process.env.NEXT_PUBLIC_BACKEND_URL,
-        });
-        const api = new FirstWebApplicationApi(config);
         const concertList = await api.concertsGet();
         return concertList;
     } catch (err) {
