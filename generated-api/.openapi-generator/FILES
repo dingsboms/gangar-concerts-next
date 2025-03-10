@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/FirstWebApplicationApi.ts
 apis/index.ts
 index.ts

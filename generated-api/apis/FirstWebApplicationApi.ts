@@ -15,7 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
-    Concert,
+  Concert,
 } from '../models/index';
 import {
     ConcertFromJSON,
@@ -28,6 +28,11 @@ export interface ConcertsIdDeleteRequest {
 
 export interface ConcertsIdGetRequest {
     id: number;
+}
+
+export interface ConcertsIdPutRequest {
+    id: number;
+    concert: Concert;
 }
 
 export interface ConcertsPostRequest {
@@ -78,6 +83,20 @@ export interface FirstWebApplicationApiInterface {
     /**
      */
     concertsIdGet(requestParameters: ConcertsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {number} id 
+     * @param {Concert} concert 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FirstWebApplicationApiInterface
+     */
+    concertsIdPutRaw(requestParameters: ConcertsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    concertsIdPut(requestParameters: ConcertsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * 
@@ -193,6 +212,46 @@ export class FirstWebApplicationApi extends runtime.BaseAPI implements FirstWebA
      */
     async concertsIdGet(requestParameters: ConcertsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.concertsIdGetRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async concertsIdPutRaw(requestParameters: ConcertsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling concertsIdPut().'
+            );
+        }
+
+        if (requestParameters['concert'] == null) {
+            throw new runtime.RequiredError(
+                'concert',
+                'Required parameter "concert" was null or undefined when calling concertsIdPut().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/concerts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConcertToJSON(requestParameters['concert']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async concertsIdPut(requestParameters: ConcertsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.concertsIdPutRaw(requestParameters, initOverrides);
     }
 
     /**
