@@ -1,19 +1,24 @@
+// pages/index.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { Concert } from "../generated-api";
 import { fetchConcerts } from "./utils/fetchConcerts";
 import { createConcert } from "./utils/createConcert";
-import ConcertTile from "./components/concertTile";
-import AddConcertButton from "./components/addConcertButton";
-import NewConcertModal from "./components/newConcertModal";
+import { updateConcert } from "./utils/updateConcert";
+import { deleteConcert } from "./utils/deleteConcert"; // Import new utility
+import ConcertTile from "./components/ConcertTile";
+import AddConcertButton from "./components/AddConcertButton";
+import NewConcertModal from "./components/NewConcertModal";
+import EditConcertModal from "./components/EditConcertModal";
 
 export default function Home() {
   const [concerts, setConcerts] = useState<Concert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedConcert, setSelectedConcert] = useState<Partial<Concert>>({});
 
-  // Fetch concerts initially
   useEffect(() => {
     fetchConcerts()
       .then(setConcerts)
@@ -24,21 +29,60 @@ export default function Home() {
   }, []);
 
   const openNewConcertModal = () => {
-    setIsModalOpen(true);
+    setIsNewModalOpen(true);
   };
 
-  const handleSaveConcert = async (newConcert: Partial<Concert>) => {
+  const handleSaveNewConcert = async (newConcert: Partial<Concert>) => {
     try {
-      // Call createConcert to save the new concert
       await createConcert(newConcert);
-      // Refresh the concert list after successful creation
       const updatedConcerts = await fetchConcerts();
       setConcerts(updatedConcerts);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save concert");
       console.error("Save concert error:", err);
     } finally {
-      setIsModalOpen(false); // Close the modal regardless of outcome
+      setIsNewModalOpen(false);
+    }
+  };
+
+  const handleEditConcert = (concert: Concert) => {
+    const concertToEdit = {
+      id: concert.id,
+      title: concert.title,
+      location: concert.location,
+      date: concert.date instanceof Date
+        ? concert.date
+        : concert.date
+        ? new Date(concert.date)
+        : undefined,
+      created: concert.created,
+      lastModified: concert.lastModified,
+    };
+    setSelectedConcert(concertToEdit);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEditedConcert = async (updatedConcert: Partial<Concert>) => {
+    try {
+      await updateConcert(updatedConcert);
+      const updatedConcerts = await fetchConcerts();
+      setConcerts(updatedConcerts);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update concert");
+      console.error("Update concert error:", err);
+    } finally {
+      setIsEditModalOpen(false);
+    }
+  };
+
+  const handleDeleteConcert = async (id: number) => {
+    try {
+      await deleteConcert(id);
+      const updatedConcerts = await fetchConcerts();
+      setConcerts(updatedConcerts);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete concert");
+      console.error("Delete concert error:", err);
     }
   };
 
@@ -56,16 +100,27 @@ export default function Home() {
 
         {!loading && !error && concerts.length > 0 && (
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
-            {concerts.map((concert, index) => (
-              <ConcertTile key={index} concert={concert} />
+            {concerts.map((concert) => (
+              <ConcertTile
+                key={concert.id ?? concert.title}
+                concert={concert}
+                onClick={handleEditConcert}
+              />
             ))}
           </ul>
         )}
         <AddConcertButton onClick={openNewConcertModal} />
         <NewConcertModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleSaveConcert}
+          isOpen={isNewModalOpen}
+          onClose={() => setIsNewModalOpen(false)}
+          onSave={handleSaveNewConcert}
+        />
+        <EditConcertModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSaveEditedConcert}
+          onDelete={handleDeleteConcert} // Pass delete handler
+          initialConcert={selectedConcert}
         />
       </main>
     </div>
