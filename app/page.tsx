@@ -1,11 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  Concert,
-  Configuration,
-  FirstWebApplicationApi,
-} from "../generated-api";
-import ConcertTile from "./components/concert_tile";
+import { Concert } from "../generated-api";
+import { fetchConcerts } from "./functions/fetchConcerts";
+import ConcertTile from "./components/concertTile";
 
 export default function Home() {
   const [concerts, setConcerts] = useState<Concert[]>([]);
@@ -13,33 +10,12 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchConcerts = async () => {
-      try {
-        const config = new Configuration({
-          basePath:
-            "https://gangarconcertswebapp-duchgsaff5enbfay.swedencentral-01.azurewebsites.net",
-        });
-        const api = new FirstWebApplicationApi(config);
-
-        const concertList = await api.concertsGet();
-        setConcerts(concertList);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        const details = err instanceof Response
-          ? `Status: ${err.status} ${err.statusText}`
-          : "";
-        setError(
-          `Failed to fetch concerts: ${message}${
-            details ? " - " + details : ""
-          }`,
-        );
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchConcerts();
+    fetchConcerts()
+      .then(setConcerts)
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : "Unknown error")
+      )
+      .finally(() => setLoading(false));
   }, []);
 
   return (
